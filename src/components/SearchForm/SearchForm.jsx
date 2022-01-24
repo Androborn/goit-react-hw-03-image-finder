@@ -17,9 +17,12 @@ export class SearchForm extends Component {
   handleSearchSubmit = e => {
     e.preventDefault();
 
-    this.props.submitSearch(this.state.searchQuery);
+    const { resetForm } = this;
+    const { searchQuery } = this.state;
+    const { onSubmit } = this.props;
 
-    this.resetForm();
+    onSubmit(searchQuery.toLowerCase());
+    resetForm();
   };
 
   resetForm = () =>
@@ -28,8 +31,11 @@ export class SearchForm extends Component {
     });
 
   render() {
+    const { handleSearchSubmit, handleInputChange } = this;
+    const { searchQuery } = this.state;
+
     return (
-      <Form onSubmit={this.handleSearchSubmit}>
+      <Form onSubmit={handleSearchSubmit}>
         <FormBtn type="submit">
           <FormBtnLabel>Search</FormBtnLabel>
         </FormBtn>
@@ -40,8 +46,8 @@ export class SearchForm extends Component {
           autoFocus
           placeHolder="Search images and photos"
           name="searchQuery"
-          value={this.state.searchQuery}
-          onChange={this.handleInputChange}
+          value={searchQuery}
+          onChange={handleInputChange}
         />
       </Form>
     );
@@ -49,5 +55,5 @@ export class SearchForm extends Component {
 }
 
 SearchForm.propTypes = {
-  submitSearch: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };

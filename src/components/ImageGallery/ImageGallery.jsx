@@ -3,14 +3,16 @@ import PropTypes from 'prop-types';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 import { Gallery } from './ImageGallery.styled';
 
-export const ImageGallery = ({ fetchedImages, showModal }) => (
+export const ImageGallery = ({ fetchedImages, onClick }) => (
   <Gallery>
     {fetchedImages.map(({ id, largeImageURL, webformatURL }) => {
       return (
         <ImageGalleryItem
           key={id}
-          smallImageUrl={webformatURL}
-          showModal={() => showModal(largeImageURL)}
+          thumbImageUrl={webformatURL}
+          onClick={() => {
+            onClick(largeImageURL);
+          }}
         ></ImageGalleryItem>
       );
     })}
@@ -18,6 +20,6 @@ export const ImageGallery = ({ fetchedImages, showModal }) => (
 );
 
 ImageGallery.propTypes = {
-  fetchedImages: PropTypes.array.isRequired,
-  showModal: PropTypes.func.isRequired,
+  fetchedImages: PropTypes.array,
+  onClick: PropTypes.func.isRequired,
 };

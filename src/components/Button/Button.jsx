@@ -2,14 +2,15 @@ import PropTypes from 'prop-types';
 
 import { Btn } from './Button.styled';
 
-export const Button = ({ showMoreImages }) => {
+export const Button = ({ onClick, children }) => {
   return (
-    <Btn type="button" onClick={() => showMoreImages()}>
-      Load more
+    <Btn type="button" onClick={onClick}>
+      {children}
     </Btn>
   );
 };
 
 Button.propTypes = {
-  showMoreImages: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
 };

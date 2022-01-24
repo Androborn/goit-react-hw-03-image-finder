@@ -1,27 +1,47 @@
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { Overlay, ModalWindow } from './Modal.styled';
 
-export const Modal = ({ hideModal, modalImg }) => (
-  <Overlay
-    onClick={e => {
-      if (e.target === e.currentTarget) {
-        hideModal();
-      }
-    }}
-    onKeyPress={e => {
-      if (e.key === 'Escape') {
-        hideModal();
-      }
-    }}
-  >
-    <ModalWindow>
-      <img src={modalImg} alt="Enlarged" />
-    </ModalWindow>
-  </Overlay>
-);
+export class Modal extends Component {
+  componentDidMount() {
+    window.addEventListener('keydown', this.handleKeyDown);
+    this.switchBodyScroll('hidden');
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleKeyDown);
+    this.switchBodyScroll('unset');
+  }
+
+  switchBodyScroll(state) {
+    document.body.style.overflow = state;
+  }
+
+  handleKeyDown = ({ code }) => {
+    if (code === 'Escape') {
+      this.props.closeModal();
+    }
+  };
+
+  render() {
+    const { closeModal, children } = this.props;
+
+    return (
+      <Overlay
+        onClick={({ target, currentTarget }) => {
+          if (target === currentTarget) {
+            closeModal();
+          }
+        }}
+      >
+        <ModalWindow>{children}</ModalWindow>
+      </Overlay>
+    );
+  }
+}
 
 Modal.propTypes = {
-  hideModal: PropTypes.func.isRequired,
-  modalImg: PropTypes.string.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
 };

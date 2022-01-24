@@ -6,7 +6,7 @@ import { Wrapper } from './App.styled';
 
 export default class App extends Component {
   state = {
-    fetchedData: [],
+    fetchedImages: [],
     fetchQuery: '',
     page: 1,
     showModal: false,
@@ -14,94 +14,99 @@ export default class App extends Component {
     loading: false,
   };
 
+  // componentDidMount() {
+  //   if (this.state.fetchedImages.length <= 0) {
+  //     return;
+  //   }
+  //   this.setState({
+  //     loading: true,
+  //   });
+  //   this.fetchImages();
+  // }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.fetchQuery !== this.state.fetchQuery ||
+      prevState.page !== this.state.page
+    ) {
+      this.fetchImages();
+    }
+    if (prevState.fetchedImages.length > 0) {
+      window.scrollBy({ top: 1000, behavior: 'smooth' });
+      // calculate positioning after scroll
+    }
+    return;
+  }
+
   recordFetchQuery = searchQuery => {
+    if (searchQuery === this.state.fetchQuery) {
+      return;
+    }
     this.setState({
       fetchQuery: searchQuery,
+      fetchedImages: [],
+      page: 1,
+      loading: true,
     });
   };
 
-  fetchData = async () => {
-    const newlyFetchedData = await pixabayApiService(
-      this.state.fetchQuery,
-      this.state.page,
-    );
+  fetchImages = async () => {
+    const { fetchQuery, page, fetchedImages } = this.state;
+    const newlyfetchedImages = await pixabayApiService(fetchQuery, page);
 
     this.setState({
-      fetchedData: [...this.state.fetchedData, ...newlyFetchedData],
+      fetchedImages: [...fetchedImages, ...newlyfetchedImages],
+      loading: false,
     });
   };
 
   loadMoreImages = () => {
     this.setState({
       page: this.state.page + 1,
-    });
-  };
-
-  toggleModal = largeImg => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-      modalImg: largeImg,
-    }));
-
-    if (this.state.showModal) {
-    }
-    if (this.state.showModal) {
-    }
-  };
-
-  componentDidMount() {
-    this.setState({
       loading: true,
     });
-    this.fetchData();
-  }
+  };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.loading) {
-      this.setState({
-        loading: false,
-      });
-    }
-    if (prevState.fetchQuery !== this.state.fetchQuery) {
-      this.setState({
-        fetchedData: [],
-      });
-      this.fetchData();
-    }
-    if (prevState.page !== this.state.page) {
-      this.fetchData();
-    }
-    window.scrollTo({ top: 10000, behavior: 'smooth' });
-    return;
-  }
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
+
+  setModalImg = largeImg => {
+    this.setState(() => ({
+      modalImg: largeImg,
+    }));
+  };
 
   render() {
-    const { recordFetchQuery, toggleModal, loadMoreImages } = this;
-    const { loading, fetchedData, showModal, modalImg } = this.state;
+    const { recordFetchQuery, loadMoreImages, toggleModal, setModalImg } = this;
+    const { loading, fetchedImages, showModal, modalImg } = this.state;
 
     return (
       <>
         <Wrapper>
           <Searchbar>
-            <SearchForm submitSearch={recordFetchQuery}></SearchForm>
+            <SearchForm onSubmit={recordFetchQuery}></SearchForm>
           </Searchbar>
-          {loading ? (
-            <Loader />
-          ) : (
-            <ImageGallery
-              fetchedImages={fetchedData}
-              showModal={this.toggleModal}
-            ></ImageGallery>
-          )}
+          <ImageGallery
+            fetchedImages={fetchedImages}
+            onClick={largeImageURL => {
+              toggleModal();
+              setModalImg(largeImageURL);
+            }}
+          ></ImageGallery>
+          {loading && <Loader />}
           {showModal && (
-            <Modal hideModal={toggleModal} modalImg={modalImg}></Modal>
+            <Modal closeModal={toggleModal}>
+              <img src={modalImg} alt="Enlarged" />
+            </Modal>
           )}
         </Wrapper>
-        <Button showMoreImages={loadMoreImages}></Button>
+        {fetchedImages.length > 0 && (
+          <Button onClick={loadMoreImages}>Load more</Button>
+        )}
       </>
     );
   }
 }
-
-// style={{ overflow: this.state.showModal ? 'hidden' : 'auto' }}
-// use later to prevent scroll under modal
