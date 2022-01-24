@@ -71,6 +71,7 @@ export default class App extends Component {
     if (prevState.page !== this.state.page) {
       this.fetchData();
     }
+    window.scrollTo({ top: 10000, behavior: 'smooth' });
     return;
   }
 
