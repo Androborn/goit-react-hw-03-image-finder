@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import { Form, FormBtn, FormBtnLabel, FormInput } from './SearchForm.styled';
 
@@ -46,3 +47,7 @@ export class SearchForm extends Component {
     );
   }
 }
+
+SearchForm.propTypes = {
+  submitSearch: PropTypes.func.isRequired,
+};

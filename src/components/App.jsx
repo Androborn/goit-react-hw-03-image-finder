@@ -38,10 +38,10 @@ export default class App extends Component {
   };
 
   toggleModal = largeImg => {
-    this.setState({
-      showModal: !this.state.showModal,
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
       modalImg: largeImg,
-    });
+    }));
 
     if (this.state.showModal) {
     }
@@ -76,28 +76,28 @@ export default class App extends Component {
   }
 
   render() {
+    const { recordFetchQuery, toggleModal, loadMoreImages } = this;
+    const { loading, fetchedData, showModal, modalImg } = this.state;
+
     return (
       <>
         <Wrapper>
           <Searchbar>
-            <SearchForm submitSearch={this.recordFetchQuery}></SearchForm>
+            <SearchForm submitSearch={recordFetchQuery}></SearchForm>
           </Searchbar>
-          {this.state.loading ? (
+          {loading ? (
             <Loader />
           ) : (
             <ImageGallery
-              fetchedImages={this.state.fetchedData}
+              fetchedImages={fetchedData}
               showModal={this.toggleModal}
             ></ImageGallery>
           )}
-          {this.state.showModal && (
-            <Modal
-              hideModal={this.toggleModal}
-              modalImg={this.state.modalImg}
-            ></Modal>
+          {showModal && (
+            <Modal hideModal={toggleModal} modalImg={modalImg}></Modal>
           )}
         </Wrapper>
-        <Button showMoreImages={this.loadMoreImages}></Button>
+        <Button showMoreImages={loadMoreImages}></Button>
       </>
     );
   }

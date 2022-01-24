@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import { Overlay, ModalWindow } from './Modal.styled';
 
 export const Modal = ({ hideModal, modalImg }) => (
@@ -18,3 +20,8 @@ export const Modal = ({ hideModal, modalImg }) => (
     </ModalWindow>
   </Overlay>
 );
+
+Modal.propTypes = {
+  hideModal: PropTypes.func.isRequired,
+  modalImg: PropTypes.string.isRequired,
+};
