@@ -14,16 +14,6 @@ export default class App extends Component {
     loading: false,
   };
 
-  // componentDidMount() {
-  //   if (this.state.fetchedImages.length <= 0) {
-  //     return;
-  //   }
-  //   this.setState({
-  //     loading: true,
-  //   });
-  //   this.fetchImages();
-  // }
-
   componentDidUpdate(prevProps, prevState) {
     if (
       prevState.fetchQuery !== this.state.fetchQuery ||
@@ -33,7 +23,7 @@ export default class App extends Component {
     }
     if (prevState.fetchedImages.length > 0) {
       window.scrollBy({ top: 1000, behavior: 'smooth' });
-      // calculate positioning after scroll
+      // !calculate positioning after scroll
     }
     return;
   }
@@ -46,12 +36,16 @@ export default class App extends Component {
       fetchQuery: searchQuery,
       fetchedImages: [],
       page: 1,
-      loading: true,
     });
   };
 
   fetchImages = async () => {
     const { fetchQuery, page, fetchedImages } = this.state;
+
+    this.setState({
+      loading: true,
+    });
+
     const newlyfetchedImages = await pixabayApiService(fetchQuery, page);
 
     this.setState({
@@ -63,7 +57,6 @@ export default class App extends Component {
   loadMoreImages = () => {
     this.setState({
       page: this.state.page + 1,
-      loading: true,
     });
   };
 
@@ -87,7 +80,7 @@ export default class App extends Component {
       <>
         <Wrapper>
           <Searchbar>
-            <SearchForm onSubmit={recordFetchQuery}></SearchForm>
+            <SearchForm onSubmit={recordFetchQuery} />
           </Searchbar>
           <ImageGallery
             fetchedImages={fetchedImages}
@@ -95,7 +88,7 @@ export default class App extends Component {
               toggleModal();
               setModalImg(largeImageURL);
             }}
-          ></ImageGallery>
+          />
           {loading && <Loader />}
           {showModal && (
             <Modal closeModal={toggleModal}>
