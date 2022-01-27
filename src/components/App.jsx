@@ -23,7 +23,7 @@ export default class App extends Component {
     }
     if (prevState.fetchedImages.length > 0) {
       window.scrollBy({ top: 1000, behavior: 'smooth' });
-      // !calculate positioning after scroll
+      // !calculate positioning after scroll for precise positioning
     }
     return;
   }
@@ -46,12 +46,21 @@ export default class App extends Component {
       loading: true,
     });
 
-    const newlyfetchedImages = await pixabayApiService(fetchQuery, page);
-
-    this.setState({
-      fetchedImages: [...fetchedImages, ...newlyfetchedImages],
-      loading: false,
-    });
+    try {
+      const newlyfetchedImages = await pixabayApiService(fetchQuery, page);
+      this.setState({
+        fetchedImages: [...fetchedImages, ...newlyfetchedImages],
+      });
+    } catch (error) {
+      console.log(error);
+      alert(
+        `An error occured processing your request. Retry, or contact site Admin for "${error.message}" if repeats.`,
+      );
+    } finally {
+      this.setState({
+        loading: false,
+      });
+    }
   };
 
   loadMoreImages = () => {
@@ -96,7 +105,7 @@ export default class App extends Component {
             </Modal>
           )}
         </Wrapper>
-        {fetchedImages.length > 0 && (
+        {fetchedImages.length > 0 && !loading && (
           <Button onClick={loadMoreImages}>Load more</Button>
         )}
       </>
