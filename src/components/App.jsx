@@ -48,9 +48,14 @@ export default class App extends Component {
 
     try {
       const newlyfetchedImages = await pixabayApiService(fetchQuery, page);
-      this.setState({
-        fetchedImages: [...fetchedImages, ...newlyfetchedImages],
-      });
+      if (Array.isArray(newlyfetchedImages)) {
+        this.setState({
+          fetchedImages: [...fetchedImages, ...newlyfetchedImages],
+        });
+        return;
+      } else {
+        throw new Error('Fetch try error');
+      }
     } catch (error) {
       console.log(error);
       alert(
