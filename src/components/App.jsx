@@ -21,7 +21,10 @@ export default class App extends Component {
     ) {
       this.fetchImages();
     }
-    if (prevState.fetchedImages.length > 0) {
+    if (
+      this.state.fetchedImages !== prevState.fetchedImages &&
+      prevState.fetchedImages.length > 0
+    ) {
       window.scrollBy({ top: 1000, behavior: 'smooth' });
       // !calculate positioning after scroll for precise positioning
     }
