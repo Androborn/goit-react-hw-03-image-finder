@@ -15,12 +15,11 @@ export class SearchForm extends Component {
   };
 
   handleSearchSubmit = e => {
-    e.preventDefault();
-
     const { resetForm } = this;
     const { searchQuery } = this.state;
     const { onSubmit } = this.props;
 
+    e.preventDefault();
     onSubmit(searchQuery.toLowerCase());
     resetForm();
   };
@@ -31,8 +30,11 @@ export class SearchForm extends Component {
     });
 
   render() {
-    const { handleSearchSubmit, handleInputChange } = this;
-    const { searchQuery } = this.state;
+    const {
+      state: { searchQuery },
+      handleInputChange,
+      handleSearchSubmit,
+    } = this;
 
     return (
       <Form onSubmit={handleSearchSubmit}>
@@ -44,7 +46,7 @@ export class SearchForm extends Component {
           type="text"
           autoComplete="off"
           autoFocus
-          placeHolder="Search images and photos"
+          placeholder="Type to search for images and photos"
           name="searchQuery"
           value={searchQuery}
           onChange={handleInputChange}

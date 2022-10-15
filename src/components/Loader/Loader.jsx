@@ -4,6 +4,6 @@ import { Wrapper } from './Loader.styled';
 
 export const Loader = () => (
   <Wrapper>
-    <Grid heigth="100" width="100" color="grey" ariaLabel="loading" />
+    <Grid height="40" width="40" color="grey" ariaLabel="loading" />
   </Wrapper>
 );

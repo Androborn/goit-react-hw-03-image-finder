@@ -1,42 +1,55 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { Overlay, ModalWindow } from './Modal.styled';
+import { Overlay, ModalImage } from './Modal.styled';
 
 export class Modal extends Component {
   componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('keydown', this.closeModal);
     this.switchBodyScroll('hidden', '17px');
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-    this.switchBodyScroll('unset', '0');
+    window.removeEventListener('keydown', this.closeModal);
+    this.switchBodyScroll('scroll', '0');
   }
 
   switchBodyScroll(state, margin) {
-    document.body.style.overflow = state;
-    document.body.style.marginRight = margin;
+    Object.assign(document.body.style, {
+      overflowY: state,
+      marginRight: margin,
+    });
+
+    // works either:
+    // document.body.style.overflowY = state;
+    // document.body.style.marginRight = margin;
+
+    // doesn't work:
+    // document.body.style = {
+    //   ...document.body.style,
+    //   overflowY: state,
+    //   marginRight: margin,
+    // };
   }
 
-  handleKeyDown = ({ code }) => {
-    if (code === 'Escape') {
+  closeModal = ({ target, currentTarget, code }) => {
+    const overlayKlicked = target === currentTarget;
+    const escKeyPressed = code === 'Escape';
+
+    if (overlayKlicked || escKeyPressed) {
       this.props.closeModal();
     }
   };
 
   render() {
-    const { closeModal, children } = this.props;
+    const {
+      props: { image },
+      closeModal,
+    } = this;
 
     return (
-      <Overlay
-        onClick={({ target, currentTarget }) => {
-          if (target === currentTarget) {
-            closeModal();
-          }
-        }}
-      >
-        <ModalWindow>{children}</ModalWindow>
+      <Overlay onClick={closeModal}>
+        <ModalImage src={image} alt="Enlarged search result" />
       </Overlay>
     );
   }
@@ -44,5 +57,5 @@ export class Modal extends Component {
 
 Modal.propTypes = {
   closeModal: PropTypes.func.isRequired,
-  children: PropTypes.node.isRequired,
+  image: PropTypes.string.isRequired,
 };

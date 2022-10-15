@@ -6,14 +6,14 @@ import { Gallery } from './ImageGallery.styled';
 export const ImageGallery = ({ fetchedImages, onClick }) => (
   <Gallery>
     {fetchedImages.map(({ id, largeImageURL, webformatURL }) => {
+      const openModal = () => onClick(largeImageURL);
+
       return (
         <ImageGalleryItem
           key={id}
           thumbImageUrl={webformatURL}
-          onClick={() => {
-            onClick(largeImageURL);
-          }}
-        ></ImageGalleryItem>
+          onClick={openModal}
+        />
       );
     })}
   </Gallery>

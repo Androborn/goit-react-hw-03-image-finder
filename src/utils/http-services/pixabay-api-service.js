@@ -6,7 +6,6 @@ const ORIENTATION = 'horizontal';
 const AGE_FILTER = 'true';
 const IMG_PER_PAGE = 12;
 
-// re-do to try-catch
 export const pixabayApiService = (searchQuery, page) => {
   axios.defaults.baseURL = BASE_URL;
   return axios
@@ -21,7 +20,13 @@ export const pixabayApiService = (searchQuery, page) => {
         page: page,
       },
     })
-    .then(({ data }) => {
-      return data.hits;
+    .then(({ data: { hits } }) => {
+      const fetchSuccessful = Array.isArray(hits);
+
+      if (fetchSuccessful) {
+        return hits;
+      } else {
+        throw new Error('Search error');
+      }
     });
 };

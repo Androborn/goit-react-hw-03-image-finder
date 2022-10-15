@@ -14,33 +14,25 @@ export default class App extends Component {
     loading: false,
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.fetchQuery !== this.state.fetchQuery ||
-      prevState.page !== this.state.page
-    ) {
-      this.fetchImages();
+  componentDidUpdate(_, prevState) {
+    const {
+      state: { fetchQuery, page, fetchedImages },
+      fetchImages,
+      scrollToNewlyLoaded,
+    } = this;
+    const searchUpdated = prevState.fetchQuery !== fetchQuery;
+    const searchPageChanged = prevState.page !== page;
+    const fetchResultUpdated = fetchedImages !== prevState.fetchedImages;
+    const fetchResultExisted = prevState.fetchedImages.length > 0;
+
+    if (searchUpdated || searchPageChanged) {
+      fetchImages();
     }
-    if (
-      this.state.fetchedImages !== prevState.fetchedImages &&
-      prevState.fetchedImages.length > 0
-    ) {
-      window.scrollBy({ top: 1000, behavior: 'smooth' });
-      // !calculate positioning after scroll for precise positioning
+    if (fetchResultUpdated && fetchResultExisted) {
+      scrollToNewlyLoaded();
     }
     return;
   }
-
-  recordFetchQuery = searchQuery => {
-    if (searchQuery === this.state.fetchQuery) {
-      return;
-    }
-    this.setState({
-      fetchQuery: searchQuery,
-      fetchedImages: [],
-      page: 1,
-    });
-  };
 
   fetchImages = async () => {
     const { fetchQuery, page, fetchedImages } = this.state;
@@ -51,14 +43,10 @@ export default class App extends Component {
 
     try {
       const newlyfetchedImages = await pixabayApiService(fetchQuery, page);
-      if (Array.isArray(newlyfetchedImages)) {
-        this.setState({
-          fetchedImages: [...fetchedImages, ...newlyfetchedImages],
-        });
-        return;
-      } else {
-        throw new Error('Fetch try error');
-      }
+
+      this.setState({
+        fetchedImages: [...fetchedImages, ...newlyfetchedImages],
+      });
     } catch (error) {
       console.log(error);
       alert(
@@ -69,6 +57,24 @@ export default class App extends Component {
         loading: false,
       });
     }
+  };
+
+  scrollToNewlyLoaded = () => {
+    window.scrollBy({ top: 1000, behavior: 'smooth' });
+  };
+
+  recordFetchQuery = searchQuery => {
+    const searchQueryChanged = searchQuery !== this.state.fetchQuery;
+
+    if (!searchQueryChanged) {
+      return;
+    }
+
+    this.setState({
+      fetchQuery: searchQuery,
+      fetchedImages: [],
+      page: 1,
+    });
   };
 
   loadMoreImages = () => {
@@ -84,14 +90,27 @@ export default class App extends Component {
   };
 
   setModalImg = largeImg => {
-    this.setState(() => ({
+    this.setState({
       modalImg: largeImg,
-    }));
+    });
+  };
+
+  openModal = largeImageURL => {
+    const { toggleModal, setModalImg } = this;
+
+    toggleModal();
+    setModalImg(largeImageURL);
   };
 
   render() {
-    const { recordFetchQuery, loadMoreImages, toggleModal, setModalImg } = this;
-    const { loading, fetchedImages, showModal, modalImg } = this.state;
+    const {
+      state: { loading, fetchedImages, showModal, modalImg },
+      recordFetchQuery,
+      loadMoreImages,
+      toggleModal,
+      openModal,
+    } = this;
+    const imagesShown = fetchedImages.length > 0;
 
     return (
       <>
@@ -99,23 +118,13 @@ export default class App extends Component {
           <Searchbar>
             <SearchForm onSubmit={recordFetchQuery} />
           </Searchbar>
-          <ImageGallery
-            fetchedImages={fetchedImages}
-            onClick={largeImageURL => {
-              toggleModal();
-              setModalImg(largeImageURL);
-            }}
-          />
+          <ImageGallery fetchedImages={fetchedImages} onClick={openModal} />
           {loading && <Loader />}
-          {showModal && (
-            <Modal closeModal={toggleModal}>
-              <img src={modalImg} alt="Enlarged" />
-            </Modal>
+          {showModal && <Modal closeModal={toggleModal} image={modalImg} />}
+          {imagesShown && !loading && (
+            <Button onClick={loadMoreImages}>Load more</Button>
           )}
         </Wrapper>
-        {fetchedImages.length > 0 && !loading && (
-          <Button onClick={loadMoreImages}>Load more</Button>
-        )}
       </>
     );
   }
